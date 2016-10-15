@@ -109,7 +109,7 @@ angular.module('dywthm.services', [])
 })
 
 .factory('Sync', function($http) {
-  var link = 'https://www.foodspan.ca/webspan/endpoint.php';
+  var link = 'https://sarick.tech:3000';
   return {
     now: function(callback) {
       var db = window.sqlitePlugin.openDatabase({ name: 'dywthm.db', location: 'default' }, function (db) {
@@ -117,10 +117,9 @@ angular.module('dywthm.services', [])
         db.executeSql('SELECT * FROM user', [], function (res){
 
           var data = {
-            username:res.rows.item(0)['username'],
-            password:res.rows.item(0)['password'],
-            a_function:"get-data",
-            parameter:"hashed"
+            user:res.rows.item(0)['username'],
+            pass:res.rows.item(0)['password'],
+            func:"get-data"
           }
 
           $http.post(link, data).then(function (response){
@@ -185,10 +184,9 @@ angular.module('dywthm.services', [])
     login: function(username, password, callback){
 
       var data = {
-        username:username,
-        password:password,
-        function:"user-in",
-        parameter:""
+        user:username,
+        pass:password,
+        func:"user-auth"
       }
 
       $http.post(link, data).then(function (res){
@@ -228,16 +226,12 @@ angular.module('dywthm.services', [])
 
           db.executeSql('SELECT * FROM user', [], function (res){
 
-            var pressData = {
-              plushid: plushid,
-              date: date
-            }
-
             var data = {
-              username:res.rows.item(0)['username'],
-              password:res.rows.item(0)['password'],
-              function:"log-data",
-              parameter:JSON.stringify(pressData)
+              user:res.rows.item(0)['username'],
+              pass:res.rows.item(0)['password'],
+              func:"log-data",
+              plush: plushid,
+              date: date
             }
 
           $http.post(link, data).then(function (res){
@@ -265,16 +259,11 @@ angular.module('dywthm.services', [])
 
         db.executeSql('SELECT * FROM user', [], function (res){
 
-          var plushData = {
-            plushid: plushid,
-            name: name
-          }
-
           var data = {
-            username:res.rows.item(0)['username'],
-            password:res.rows.item(0)['password'],
-            function:"add-plush",
-            parameter:JSON.stringify(plushData)
+            user:res.rows.item(0)['username'],
+            pass:res.rows.item(0)['password'],
+            func:"add-plush",
+            nickname: name
           }
 
         $http.post(link, data).then(function (res){
@@ -308,9 +297,9 @@ angular.module('dywthm.services', [])
           }
 
           var data = {
-            username:res.rows.item(0)['username'],
-            password:res.rows.item(0)['password'],
-            function:"edit-plush",
+            user:res.rows.item(0)['username'],
+            pass:res.rows.item(0)['password'],
+            func:"edit-plush",
             parameter:JSON.stringify(plushData)
           }
 
