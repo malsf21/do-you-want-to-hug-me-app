@@ -145,20 +145,37 @@ angular.module('dywthm.services', [])
                   });
 
                   db.transaction(function (tx) {
-
+                    function contains(a, obj) {
+                      var i = a.length;
+                      while (i--) {
+                       if (a[i][1] === obj) {
+                         return true;
+                       }
+                      }
+                      return false;
+                    }
+                    console.log("parsing response file");
+                    var plushes = [];
+                    var presses = [];
+                    for (i = 0; i < response.data.length; i++){
+                      presses.push([i, response.data[i]["plush_id"], response.data[i]["date"]]);
+                      if (contains(plushes, response.data[i]["plush_id"]) === false){
+                        plushes.push([i, response.data[i]["plush_id"], response.data[i]["plush_name"]]);
+                      }
+                    }
                     console.log("adding to plush database");
                     // PLUSHID!!!!
-                    for (var i = 0; i < response.data['plushes'].length; i++){
-                      tx.executeSql('INSERT INTO plushes (id, plushid, name, img, type) VALUES (?,?,?,?,?)',
-                      [i, response.data['registered_plushes'][i]['plushid'], response.data['registered_plushes'][i]['name'], "img/android.jpg", "Android"]);
+                    for (i = 0; i < plushes.length; i++){
+                      tx.executeSql('INSERT INTO plushes (id, plushid, name, img, type) VALUES (' + i + ', ' + plushes[i][1] + ', ' + plushes[i][2] + ', "img/android.jpg","Android")');
                     }
 
                     console.log("adding to presses database");
 
-                    for (var i = 0; i < response.data['presses'].length; i++){
-                      tx.executeSql('INSERT INTO presses (id, plushid, date) VALUES (?,?,?)',
-                        [i, response.data['presses'][i]['plushid'], response.data['presses'][i]['date']]);
+                    for (i = 0; i < presses.length; i++){
+                      tx.executeSql('INSERT INTO presses (id, plushid, date) VALUES (' + i + ', ' + presses[i][1] + ', ' + presses[i][2] + ')');
                     }
+
+
 
                     callback();
 
@@ -202,7 +219,7 @@ angular.module('dywthm.services', [])
               db.transaction(function (tx) {
                 tx.executeSql('DELETE FROM USER');
                 tx.executeSql('INSERT INTO user (username, password, name) VALUES (?, ?, ?)',
-                [username, res.data['password'], res.data['name']]);
+                [username, password, res.data['name']]);
 
                 callback(1);
               }, function (error) {

@@ -5,6 +5,7 @@
     on-refresh="$root.refreshPlushes()">
     </ion-refresher>
     <ion-list>
+      <h4 class="no-elements" ng-hide="hasPlushes">No plushes so far!</h4>
       <ion-item class="item-icon-right" ng-repeat="plush in plushes" href="#/app/plushes/{{plush.id}}">
         <div class="row">
           <div class="col">

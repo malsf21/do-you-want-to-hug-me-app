@@ -39,7 +39,7 @@ angular.module('dywthm.controllers', [])
   $scope.doLogin = function(user) {
 
     console.log('Doing login', $scope.loginData);
-    Sync.login($scope.loginData.email, $scope.loginData.password, function(code){
+    Sync.login($scope.loginData.username, $scope.loginData.password, function(code){
       if (code == 0){
         $scope.noConnectionPopup();
       } else if (code == 1){
@@ -84,8 +84,6 @@ angular.module('dywthm.controllers', [])
 
     document.addEventListener('deviceready', function() {
 
-      $scope.dashData = {};
-
       $timeout($scope.onTimeout, 1000);
 
       Sync.now(function () {
@@ -96,7 +94,7 @@ angular.module('dywthm.controllers', [])
 
           $scope.$apply();
         });
-
+        /*
         Database.getPlushes(function (plushData) {
 
           $scope.dashData.cpCount = panelData.length;
@@ -105,7 +103,7 @@ angular.module('dywthm.controllers', [])
 
           $scope.$broadcast('scroll.refreshComplete');
         });
-
+        */
         Database.getPresses(function (pressData) {
           daily = 0;
           montly = 0;
@@ -178,9 +176,9 @@ angular.module('dywthm.controllers', [])
     Database.getPlushes(function (plushesData) {
 
       if (plushesData.length == 0){
-        $scope.noPlushes = false;
+        $scope.hasPlushes = true;
       } else {
-        $scope.noPlushes = true;
+        $scope.hasPlushes = false;
       }
 
       $scope.plushes = plushesData;
