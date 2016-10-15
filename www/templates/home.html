@@ -3,30 +3,45 @@
     <div class="list card">
 
       <div class="item">
-        <h2>Good Morning Matt!</h2>
+        <h2>Good {{greeting}} Matt!</h2>
         <p>It's {{date}}</p>
       </div>
 
       <div class="item item-divider">
-        <h2>Your Dolls</h2>
+        <h2>The Hug Stats</h2>
       </div>
 
       <div class="item">
-        
+        <ul class="list-unstyled">
+          <li>
+            <b>{{dolls.daily}}</b> hugs today
+          </li>
+          <li>
+            <b>{{dolls.monthly}}</b> hugs this month
+          </li>
+          <li>
+            <b>{{dolls.yearly}}</b> hugs this year
+          </li>
+          <li>
+            <b>{{dolls.lifetime}}</b> hugs since the beginning of time
+          </li>
+          <li>
+
+          </li>
+          <li>
+            <b>{{dolls.avg}}</b> hugs per hour
+          </li>
+        </ul>
       </div>
 
-      <div class="item" ng-repeat="doll in dolls">
-        <div class="row">
-          <div class="col">
-            <img class="img-responsive" src="{{doll.img}}">
-          </div>
-          <div class="col col-75">
-            <h2><b>{{doll.name}}</b> the {{doll.type}}</h2>
-            <p>{{doll.daily}} Hugs Today, {{doll.lifetime}} Hugs Total</p>
-            <p>Averaging {{doll.avg}} Hugs per hour</p>
-          </div>
-        </div>
+      <div class="item item-divider">
+        <h2>The Hug Graph</h2>
       </div>
+
+      <div class="item">
+        <highchart id="chart-main" config="chartConfig" class="span10"></highchart>
+      </div>
+
     </div>
   </ion-content>
 </ion-view>

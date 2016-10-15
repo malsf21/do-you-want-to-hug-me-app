@@ -1,10 +1,5 @@
-// Ionic dywthm App
 
-// angular.module is a global place for creating, registering and retrieving Angular modules
-// 'dywthm' is the name of this angular module example (also set in a <body> attribute in index.html)
-// the 2nd parameter is an array of 'requires'
-// 'dywthm.controllers' is found in controllers.js
-angular.module('dywthm', ['ionic', 'dywthm.controllers', 'dywthm.services'])
+angular.module('dywthm', ['ionic', 'dywthm.controllers', 'dywthm.services', 'highcharts-ng'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -61,7 +56,8 @@ angular.module('dywthm', ['ionic', 'dywthm.controllers', 'dywthm.services'])
     url: '/account',
     views: {
       'menuContent': {
-        templateUrl: 'templates/account.html'
+        templateUrl: 'templates/account.html',
+        controller: 'AccountCtrl'
       }
     }
   })

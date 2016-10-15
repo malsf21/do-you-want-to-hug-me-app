@@ -46,6 +46,26 @@ angular.module('dywthm.services', [])
           return dolls[i];
         }
       }
+    },
+    getAll: function(){
+      var total = {
+        "daily": 0,
+        "monthly": 0,
+        "yearly": 0,
+        "lifetime": 0,
+        "hours": 0,
+        "avg": 0
+      }
+      for (i = 0; i < dolls.length; i++) {
+        total["daily"] += dolls[i]["daily"];
+        total["monthly"] += dolls[i]["monthly"];
+        total["yearly"] += dolls[i]["yearly"];
+        total["lifetime"] += dolls[i]["lifetime"];
+        total["hours"] += dolls[i]["hours"];
+      }
+      total["avg"] = parseFloat(total["lifetime"])/parseFloat(total["hours"]);
+      total["avg"] = Number(total["avg"]).toFixed(1);
+      return total;
     }
   };
 });

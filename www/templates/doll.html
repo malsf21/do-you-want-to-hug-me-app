@@ -9,27 +9,37 @@
         </center>
       </div>
       <div class="item item-divider">
-        {{doll.name}} Stats
+        {{doll.name}} Hug Stats
       </div>
       <div class="item">
-        <p>
-          <span class="bold">Hugs Today:</span> {{doll.daily}}
-        </p>
-        <p>
-          <span class="bold">Hugs This Month:</span> {{doll.monthly}}
-        </p>
-        <p>
-          <span class="bold">Hugs This Year:</span> {{doll.yearly}}
-        </p>
-        <p>
-          <span class="bold">Lifetime Hugs:</span> {{doll.lifetime}}
-        </p>
-        <p>
-          <span class="bold">Active Hours:</span> {{doll.hours}}
-        </p>
-        <p>
-          <span class="bold">Hugs Per Hour:</span> {{doll.avg}}
-        </p>
+        <ul class="list-unstyled">
+          <li>
+            <b>{{doll.daily}}</b> hugs today
+          </li>
+          <li>
+            <b>{{doll.monthly}}</b> hugs this month
+          </li>
+          <li>
+            <b>{{doll.yearly}}</b> hugs this year
+          </li>
+          <li>
+            <b>{{doll.lifetime}}</b> hugs since the beginning of time
+          </li>
+          <li>
+
+          </li>
+          <li>
+            <b>{{doll.avg}}</b> hugs per hour
+          </li>
+        </ul>
+      </div>
+
+      <div class="item item-divider">
+        <h2>{{doll.name}} Hug Graph</h2>
+      </div>
+
+      <div class="item">
+        <highchart id="chart-main" config="chartConfig" class="span10"></highchart>
       </div>
     </div>
   </ion-content>
