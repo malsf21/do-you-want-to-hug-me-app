@@ -1,5 +1,5 @@
 
-angular.module('dywthm', ['ionic', 'dywthm.controllers', 'dywthm.services', 'highcharts-ng'])
+angular.module('dywthm', ['ionic', 'ngCordova', 'dywthm.controllers', 'dywthm.services', 'highcharts-ng'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -70,22 +70,22 @@ angular.module('dywthm', ['ionic', 'dywthm.controllers', 'dywthm.services', 'hig
         }
       }
     })
-    .state('app.dolls', {
-      url: '/dolls',
+    .state('app.plushes', {
+      url: '/plushes',
       views: {
         'menuContent': {
-          templateUrl: 'templates/dolls.html',
-          controller: 'DollsCtrl'
+          templateUrl: 'templates/plushes.html',
+          controller: 'PlushesCtrl'
         }
       }
     })
 
   .state('app.single', {
-    url: '/dolls/:dollId',
+    url: '/plushes/:plushId',
     views: {
       'menuContent': {
-        templateUrl: 'templates/doll.html',
-        controller: 'DollCtrl'
+        templateUrl: 'templates/plush.html',
+        controller: 'PlushCtrl'
       }
     }
   });

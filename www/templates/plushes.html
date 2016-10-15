@@ -1,0 +1,23 @@
+<ion-view view-title="Plushes">
+  <ion-content>
+    <ion-refresher
+    pulling-text="Pull to refresh..."
+    on-refresh="$root.refreshPlushes()">
+    </ion-refresher>
+    <ion-list>
+      <ion-item class="item-icon-right" ng-repeat="plush in plushes" href="#/app/plushes/{{plush.id}}">
+        <div class="row">
+          <div class="col">
+            <img class="img-responsive" src="{{plush.img}}">
+          </div>
+          <div class="col col-75">
+            <h2><b>{{plush.name}}</b> the {{plush.type}}</h2>
+            <p>{{plush.daily}} Hugs Today, {{plush.lifetime}} Hugs Total</p>
+            <p>Averaging {{plush.avg}} Hugs per hour</p>
+          </div>
+        </div>
+        <i class="icon ion-chevron-right icon-accessory"></i>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>

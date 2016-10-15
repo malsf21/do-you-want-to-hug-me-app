@@ -1,7 +1,343 @@
 angular.module('dywthm.services', [])
 
-.factory('Dolls', function() {
-  var dolls = [{
+.factory('Database', function() {
+  function getPlushes(callback){
+    var db = window.sqlitePlugin.openDatabase({ name: 'dywthm.db', location: 'default' }, function (db) {
+      var query = 'SELECT * FROM plushes';
+      var plushes = {};
+      db.executeSql(query, [], function (selectRes){
+        console.log("Executing Query");
+        if (selectRes.rows.length < 0){
+            callback([]);
+            console.log('No Plushes Registered');
+        } else {
+          for (var i = 0; i < selectRes.rows.length; i++){
+            var plush = {
+              id: i,
+              plushid : selectRes.rows.item(i).plushid,
+              name: selectRes.rows.item(i).name,
+              img: selectRes.rows.item(i).img,
+              type: selectRes.rows.item(i).type
+            };
+            plushes.push(plush);
+          }
+          callback(plushes);
+        }
+      });
+    });
+  }
+  function getPresses(callback){
+    var db = window.sqlitePlugin.openDatabase({ name: 'dywthm.db', location: 'default' }, function (db) {
+      var query = 'SELECT * FROM presses';
+      var presses = {};
+      db.executeSql(query, [], function (selectRes){
+        console.log("Executing Query");
+        if (selectRes.rows.length < 0){
+            callback([]);
+            console.log('No Presses Registered');
+        } else {
+          for (var i = 0; i < selectRes.rows.length; i++){
+            var press = {
+              id: i,
+              plushid : selectRes.rows.item(i).plushid,
+              date: selectRes.rows.item(i).date
+            };
+            presses.push(press);
+          }
+          callback(presses);
+        }
+      });
+    });
+  }
+  function getUser(callback){
+    var userData;
+
+    var db = window.sqlitePlugin.openDatabase({ name: 'dywthm.db', location: 'default' }, function (db) {
+
+      db.executeSql('SELECT * FROM user', [], function(res){
+        console.log('Getting User Data');
+        callback(res.rows.item(0));
+      },function (error) {
+        console.log('transaction error: ' + error.message);
+      });
+
+    }, function (error) {
+      console.log('Open database ERROR: ' + JSON.stringify(error));
+    });
+  }
+  return {
+
+    getUser: function (callback){
+      getUser(callback);
+    },
+    getPlushes: function(callback){
+      getPlushes(callback);
+    },
+    getPresses: function(callback){
+      getPresses(callback)
+    },
+    logout: function (callback){
+      var db = window.sqlitePlugin.openDatabase({ name: 'dywthm.db', location: 'default' }, function (db) {
+        db.executeSql('DELETE FROM user');
+        db.executeSql('DELETE from plushes');
+        db.executeSql('DELETE from presses');
+        callback();
+      });
+    },
+    checkLogin: function (callback){
+      document.addEventListener('deviceready', function() {
+        var db = window.sqlitePlugin.openDatabase({ name: 'dywthm.db', location: 'default' }, function (db) {
+
+          db.executeSql('CREATE TABLE IF NOT EXISTS user (username, password, name)');
+          db.executeSql('SELECT * FROM user', [], function (res){
+              if (navigator.connection.type == Connection.NONE){
+                callback(0);
+              } else if (res.rows.length > 0){
+                callback(1);
+              } else {
+                callback(2);
+              }
+            }, function (error) {
+            console.log('transaction error: ' + error.message);
+          })
+        }, function (error) {
+          console.log('Open database ERROR: ' + JSON.stringify(error));
+        });
+      });
+    }
+  }
+})
+
+.factory('Sync', function($http) {
+  var link = 'https://www.foodspan.ca/webspan/endpoint.php';
+  return {
+    now: function(callback) {
+      var db = window.sqlitePlugin.openDatabase({ name: 'dywthm.db', location: 'default' }, function (db) {
+
+        db.executeSql('SELECT * FROM user', [], function (res){
+
+          var data = {
+            username:res.rows.item(0)['username'],
+            password:res.rows.item(0)['password'],
+            a_function:"get-data",
+            parameter:"hashed"
+          }
+
+          $http.post(link, data).then(function (response){
+
+              document.addEventListener('deviceready', function() {
+                var db = window.sqlitePlugin.openDatabase({ name: 'dywthm.db', location: 'default' }, function (db) {
+
+                  db.transaction(function (tx) {
+                    //CREATE TAG TABLE
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS plushes (id, plushid, name, img, type)');
+
+                    tx.executeSql('DELETE FROM plushes');
+
+                    //CREATE PANEL TABLE
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS presses (id, plushid, date)');
+
+                    tx.executeSql('DELETE FROM panel');
+
+                  }, function (error) {
+                    console.log('clear - transaction error: ' + error.message);
+                  }, function () {
+                    console.log('clear - transaction ok');
+                  });
+
+                  db.transaction(function (tx) {
+
+                    console.log("adding to plush database");
+                    // PLUSHID!!!!
+                    for (var i = 0; i < response.data['plushes'].length; i++){
+                      tx.executeSql('INSERT INTO plushes (id, plushid, name, img, type) VALUES (?,?,?,?,?)',
+                      [i, response.data['registered_plushes'][i]['plushid'], response.data['registered_plushes'][i]['name'], "img/android.jpg", "Android"]);
+                    }
+
+                    console.log("adding to presses database");
+
+                    for (var i = 0; i < response.data['presses'].length; i++){
+                      tx.executeSql('INSERT INTO presses (id, plushid, date) VALUES (?,?,?)',
+                        [i, response.data['presses'][i]['plushid'], response.data['presses'][i]['date']]);
+                    }
+
+                    callback();
+
+                  }, function (error) {
+                    console.log('insert - transaction error: ' + error.message);
+                  }, function () {
+                    console.log('insert - transaction ok');
+                  });
+
+                }, function (error) {
+                  console.log('Open database ERROR: ' + JSON.stringify(error));
+                });
+              });
+            }, (function (res){
+            console.log("sync - connection failed");
+          }));
+        });
+      }, function (error) {
+        console.log('Open database ERROR: ' + JSON.stringify(error));
+      });
+    },
+
+    login: function(username, password, callback){
+
+      var data = {
+        username:username,
+        password:password,
+        function:"user-in",
+        parameter:""
+      }
+
+      $http.post(link, data).then(function (res){
+        console.log ("server response:" + res.data['password']);
+
+        if (res.data == "bad_credentials"){
+          callback(2);
+
+        } else {
+          document.addEventListener('deviceready', function() {
+            var db = window.sqlitePlugin.openDatabase({ name: 'dywthm.db', location: 'default' }, function (db) {
+
+              db.transaction(function (tx) {
+                tx.executeSql('DELETE FROM USER');
+                tx.executeSql('INSERT INTO user (username, password, name) VALUES (?, ?, ?)',
+                [username, res.data['password'], res.data['name']]);
+
+                callback(1);
+              }, function (error) {
+                console.log('transaction error: ' + error.message);
+              }, function () {
+                console.log('login - transaction ok');
+              });
+            }, function (error) {
+              console.log('Open database ERROR: ' + JSON.stringify(error));
+            });
+          });
+        }
+      }, (function (res){
+        console.log("login - connection failed");
+        callback(0);
+      }));
+    },
+    addPress: function(plushid, date, callback) {
+
+        var db = window.sqlitePlugin.openDatabase({ name: 'dywthm.db', location: 'default' }, function (db) {
+
+          db.executeSql('SELECT * FROM user', [], function (res){
+
+            var pressData = {
+              plushid: plushid,
+              date: date
+            }
+
+            var data = {
+              username:res.rows.item(0)['username'],
+              password:res.rows.item(0)['password'],
+              function:"log-data",
+              parameter:JSON.stringify(pressData)
+            }
+
+          $http.post(link, data).then(function (res){
+
+            console.log(res.data);
+
+            if (res.data == "success"){
+              callback(true);
+            } else {
+              callback(false);
+            }
+
+          }, (function (res){
+            console.log("add press - connection failed");
+            callback(false);
+          }));
+        });
+      }, function (error) {
+        console.log('Open database ERROR: ' + JSON.stringify(error));
+      });
+    },
+    addPlush: function(plushid, name, callback) {
+
+        var db = window.sqlitePlugin.openDatabase({ name: 'dywthm.db', location: 'default' }, function (db) {
+
+        db.executeSql('SELECT * FROM user', [], function (res){
+
+          var plushData = {
+            plushid: plushid,
+            name: name
+          }
+
+          var data = {
+            username:res.rows.item(0)['username'],
+            password:res.rows.item(0)['password'],
+            function:"add-plush",
+            parameter:JSON.stringify(plushData)
+          }
+
+        $http.post(link, data).then(function (res){
+
+          console.log(res.data);
+
+          if (res.data == "success"){
+            callback(true);
+          } else {
+            callback(false);
+          }
+
+        }, (function (res){
+          console.log("add plush - connection failed");
+          callback(false);
+        }));
+      });
+      }, function (error) {
+        console.log('Open database ERROR: ' + JSON.stringify(error));
+      });
+    },
+    editPlush: function(plushid, name, callback) {
+
+        var db = window.sqlitePlugin.openDatabase({ name: 'dywthm.db', location: 'default' }, function (db) {
+
+        db.executeSql('SELECT * FROM user', [], function (res){
+
+          var plushData = {
+            plushid: plushid,
+            name: name
+          }
+
+          var data = {
+            username:res.rows.item(0)['username'],
+            password:res.rows.item(0)['password'],
+            function:"edit-plush",
+            parameter:JSON.stringify(plushData)
+          }
+
+        $http.post(link, data).then(function (res){
+
+          console.log(res.data);
+
+          if (res.data == "success"){
+            callback(true);
+          } else {
+            callback(false);
+          }
+
+        }, (function (res){
+          console.log("add plush - connection failed");
+          callback(false);
+        }));
+      });
+      }, function (error) {
+        console.log('Open database ERROR: ' + JSON.stringify(error));
+      });
+    }
+  }
+})
+
+.factory('Plushes', function(Database) {
+  var plushes = [{
     "name": "Octobiwan",
     "id": 1,
     "type": "Octocat",
@@ -38,14 +374,16 @@ angular.module('dywthm.services', [])
 
   return {
     all: function() {
-      return dolls;
+      return plushes;
     },
-    get: function(id) {
-      for (i = 0; i < dolls.length; i++) {
-        if (dolls[i].id == id){
-          return dolls[i];
+    get: function(id, callback) {
+      Database.getPlushes(function (plushes) {
+        for (var i = 0; i < plushes.length; i++) {
+          if (plushes[i].id === parseInt(id)) {
+            callback (plushes[i]);
+          }
         }
-      }
+      });
     },
     getAll: function(){
       var total = {
@@ -56,16 +394,29 @@ angular.module('dywthm.services', [])
         "hours": 0,
         "avg": 0
       }
-      for (i = 0; i < dolls.length; i++) {
-        total["daily"] += dolls[i]["daily"];
-        total["monthly"] += dolls[i]["monthly"];
-        total["yearly"] += dolls[i]["yearly"];
-        total["lifetime"] += dolls[i]["lifetime"];
-        total["hours"] += dolls[i]["hours"];
+      for (i = 0; i < plushes.length; i++) {
+        total["daily"] += plushes[i]["daily"];
+        total["monthly"] += plushes[i]["monthly"];
+        total["yearly"] += plushes[i]["yearly"];
+        total["lifetime"] += plushes[i]["lifetime"];
+        total["hours"] += plushes[i]["hours"];
       }
       total["avg"] = parseFloat(total["lifetime"])/parseFloat(total["hours"]);
       total["avg"] = Number(total["avg"]).toFixed(1);
       return total;
     }
   };
+})
+.factory('Presses', function(Database){
+  return{
+    get: function(id, callback) {
+      Database.getPresses(function (presses) {
+        for (var i = 0; i < presses.length; i++) {
+          if (presses[i].id === parseInt(id)) {
+            callback (presses[i]);
+          }
+        }
+      });
+    }
+  }
 });

@@ -1,9 +1,13 @@
 <ion-view view-title="Home">
   <ion-content>
+    <ion-refresher
+    pulling-text="Pull to refresh..."
+    on-refresh="$root.refreshDash()"
+    ng-if="!$root.noInternet">
+    </ion-refresher>
     <div class="list card">
-
       <div class="item">
-        <h2>Good {{greeting}} Matt!</h2>
+        <h2>Good {{greeting}} {{name}}!</h2>
         <p>It's {{date}}</p>
       </div>
 
@@ -14,22 +18,22 @@
       <div class="item">
         <ul class="list-unstyled">
           <li>
-            <b>{{dolls.daily}}</b> hugs today
+            <b>{{daily}}</b> hugs today
           </li>
           <li>
-            <b>{{dolls.monthly}}</b> hugs this month
+            <b>{{monthly}}</b> hugs this month
           </li>
           <li>
-            <b>{{dolls.yearly}}</b> hugs this year
+            <b>{{yearly}}</b> hugs this year
           </li>
           <li>
-            <b>{{dolls.lifetime}}</b> hugs since the beginning of time
+            <b>{{lifetime}}</b> hugs since the beginning of time
           </li>
           <li>
 
           </li>
           <li>
-            <b>{{dolls.avg}}</b> hugs per hour
+            <b>{{avg}}</b> hugs per hour
           </li>
         </ul>
       </div>
