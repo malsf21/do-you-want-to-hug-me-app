@@ -1,0 +1,19 @@
+<ion-view view-title="Dolls">
+  <ion-content>
+    <ion-list>
+      <ion-item class="item-icon-right" ng-repeat="doll in dolls" href="#/app/dolls/{{doll.id}}">
+        <div class="row">
+          <div class="col">
+            <img class="img-responsive" src="{{doll.img}}">
+          </div>
+          <div class="col col-75">
+            <h2><b>{{doll.name}}</b> the {{doll.type}}</h2>
+            <p>{{doll.daily}} Hugs Today, {{doll.lifetime}} Hugs Total</p>
+            <p>Averaging {{doll.avg}} Hugs per hour</p>
+          </div>
+        </div>
+        <i class="icon ion-chevron-right icon-accessory"></i>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>

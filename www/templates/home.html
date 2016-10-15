@@ -1,0 +1,32 @@
+<ion-view view-title="Home">
+  <ion-content>
+    <div class="list card">
+
+      <div class="item">
+        <h2>Good Morning Matt!</h2>
+        <p>It's {{date}}</p>
+      </div>
+
+      <div class="item item-divider">
+        <h2>Your Dolls</h2>
+      </div>
+
+      <div class="item">
+        
+      </div>
+
+      <div class="item" ng-repeat="doll in dolls">
+        <div class="row">
+          <div class="col">
+            <img class="img-responsive" src="{{doll.img}}">
+          </div>
+          <div class="col col-75">
+            <h2><b>{{doll.name}}</b> the {{doll.type}}</h2>
+            <p>{{doll.daily}} Hugs Today, {{doll.lifetime}} Hugs Total</p>
+            <p>Averaging {{doll.avg}} Hugs per hour</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ion-content>
+</ion-view>

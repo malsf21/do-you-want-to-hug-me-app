@@ -1,0 +1,36 @@
+<ion-view view-title="{{doll.name}}">
+  <ion-content>
+    <div class="list card">
+      <div class="item">
+        <img class="img-doll-detail" src="{{doll.img}}" />
+        <center>
+          <h1>{{doll.name}}</h1>
+          <h2>the {{doll.type}}</h2>
+        </center>
+      </div>
+      <div class="item item-divider">
+        {{doll.name}} Stats
+      </div>
+      <div class="item">
+        <p>
+          <span class="bold">Hugs Today:</span> {{doll.daily}}
+        </p>
+        <p>
+          <span class="bold">Hugs This Month:</span> {{doll.monthly}}
+        </p>
+        <p>
+          <span class="bold">Hugs This Year:</span> {{doll.yearly}}
+        </p>
+        <p>
+          <span class="bold">Lifetime Hugs:</span> {{doll.lifetime}}
+        </p>
+        <p>
+          <span class="bold">Active Hours:</span> {{doll.hours}}
+        </p>
+        <p>
+          <span class="bold">Hugs Per Hour:</span> {{doll.avg}}
+        </p>
+      </div>
+    </div>
+  </ion-content>
+</ion-view>
