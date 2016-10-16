@@ -45,13 +45,13 @@ angular.module('dywthm.controllers', [])
   $scope.dolls = dolls;
   var date = new Date();
   $scope.date = date.toLocaleTimeString() + ", "+ date.toDateString();
-  if (date.getHours > 18){
+  if (date.getHours() > 18){
     $scope.greeting = "Evening";
   }
-  else if (date.getHour > 12){
+  else if (date.getHours() > 12){
     $scope.greeting = "Afternoon";
   }
-  else if (date.getHour > 6){
+  else if (date.getHours() > 4){
     $scope.greeting = "Morning";
   }
   else{
